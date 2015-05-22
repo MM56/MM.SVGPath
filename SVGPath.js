@@ -1,9 +1,10 @@
 var MM = MM || {};
 MM.SVGPath = (function() {
 	function SVGPath(path) {
-		if(path != undefined) {
-			this.commands = SVGPath.parse(path);
+		if(path == undefined) {
+			path = "";
 		}
+		this.commands = SVGPath.parse(path);
 	}
 
 	SVGPath.prototype.scale = function(scaleXRatio, scaleYRatio, scaleOrigin) {
