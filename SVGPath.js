@@ -4,26 +4,45 @@ MM.SVGPath = (function() {
 		if(path == undefined) {
 			path = "";
 		}
-		this.commands = SVGPath.parse(path);
+		this.originalCommands = SVGPath.parse(path);
+		this.commands = this.cloneCommands(this.originalCommands);
 	}
+
+	SVGPath.prototype.cloneCommands = function(commandsToBeCloned) {
+		var commands = [];
+		var nbCommands = commandsToBeCloned.length;
+		var command, commandToBeCloned;
+		for(var i = 0; i < nbCommands; i++) {
+			commandToBeCloned = commandsToBeCloned[i];
+			command = {letter: commandToBeCloned.letter, params: {}};
+			for(var key in commandToBeCloned.params) {
+				command.params[key] = commandToBeCloned.params[key];
+			}
+			commands.push(command);
+		}
+		return commands;
+	};
 
 	SVGPath.prototype.scale = function(scaleXRatio, scaleYRatio, scaleOrigin) {
 		if(scaleOrigin == undefined) {
 			scaleOrigin = {x: 0, y: 0};
 		}
 		var nbCommands = this.commands.length;
+		var originalCommand, originalParams, command, params;
 		for(var i = 0; i < nbCommands; i++) {
+			originalCommand = this.originalCommands[i];
+			originalParams = originalCommand.params;
 			command = this.commands[i];
 			params = command.params;
-			params.x = (params.x - scaleOrigin.x) * scaleXRatio;
-			params.y = (params.y - scaleOrigin.y) * scaleYRatio;
-			if(params.cx1 != undefined && params.cy1 != undefined) {
-				params.cx1 = (params.cx1 - scaleOrigin.x) * scaleXRatio;
-				params.cy1 = (params.cy1 - scaleOrigin.y) * scaleYRatio;
+			params.x = (originalParams.x - scaleOrigin.x) * scaleXRatio;
+			params.y = (originalParams.y - scaleOrigin.y) * scaleYRatio;
+			if(originalParams.cx1 != undefined && originalParams.cy1 != undefined) {
+				params.cx1 = (originalParams.cx1 - scaleOrigin.x) * scaleXRatio;
+				params.cy1 = (originalParams.cy1 - scaleOrigin.y) * scaleYRatio;
 			}
-			if(params.cx2 != undefined && params.cy2 != undefined) {
-				params.cx2 = (params.cx2 - scaleOrigin.x) * scaleXRatio;
-				params.cy2 = (params.cy2 - scaleOrigin.y) * scaleYRatio;
+			if(originalParams.cx2 != undefined && originalParams.cy2 != undefined) {
+				params.cx2 = (originalParams.cx2 - scaleOrigin.x) * scaleXRatio;
+				params.cy2 = (originalParams.cy2 - scaleOrigin.y) * scaleYRatio;
 			}
 		}
 	};
