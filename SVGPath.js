@@ -1,4 +1,5 @@
 var MM = MM || {};
+
 MM.SVGPath = (function() {
 	function SVGPath(path) {
 		if(path == undefined) {
@@ -184,8 +185,8 @@ MM.SVGPath = (function() {
 		return str;
 	};
 
-	SVGPath.parse = function(path) {
-		var commandsSplitted = path.replace(/([a-z][^a-z]*)/gi, "$1\n");
+	SVGPath.parse = function(pathStr) {
+		var commandsSplitted = pathStr.replace(/([a-z][^a-z]*)/gi, "$1\n");
 		var commands = commandsSplitted.split("\n");
 		commands.pop()
 		var currentLocation = {x: 0, y: 0};
@@ -349,5 +350,26 @@ MM.SVGPath = (function() {
 		}
 		return finalCommands;
 	};
+
+	SVGPath.getAngleFromDistanceRatio = function(path, ratio) {
+		var totalLength = path.getTotalLength();
+		var distance = ratio * totalLength;
+		var point = path.getPointAtLength(distance);
+		var nextDistance;
+		if(distance + 1 <= totalLength) {
+			nextDistance = distance + 1;
+		} else {
+			nextDistance = distance - 1;
+		}
+		var nextPoint = path.getPointAtLength(nextDistance);
+		var deltaX = nextPoint.x - point.x;
+		var deltaY = nextPoint.y - point.y;
+		var angle = Math.atan2(deltaY, deltaX);
+		if(nextDistance < distance) {
+			angle = angle + Math.PI;
+		}
+		return angle;
+	}
+
 	return SVGPath;
 })();
