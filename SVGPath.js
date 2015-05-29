@@ -1,11 +1,16 @@
 var MM = MM || {};
 
 MM.SVGPath = (function() {
-	function SVGPath(path) {
-		if(path == undefined) {
-			path = "";
+	function isMSIE() {
+		return window.navigator.userAgent.indexOf("MSIE ") > 0 || !!window.navigator.userAgent.match(/Trident.*rv\:11\./);
+	}
+
+	function SVGPath(pathStr) {
+		if(pathStr == undefined) {
+			pathStr = "";
 		}
-		this.originalCommands = SVGPath.parse(path);
+
+		this.originalCommands = SVGPath.parse(pathStr);
 		this.commands = this.cloneCommands(this.originalCommands);
 	}
 
@@ -186,6 +191,7 @@ MM.SVGPath = (function() {
 	};
 
 	SVGPath.parse = function(pathStr) {
+		var isIE = isMSIE();
 		var commandsSplitted = pathStr.replace(/([a-z][^a-z]*)/gi, "$1\n");
 		var commands = commandsSplitted.split("\n");
 		commands.pop()
@@ -200,11 +206,17 @@ MM.SVGPath = (function() {
 			finalCommand = {};
 			letter = command.substr(0, 1);
 			paramsStr = command.substr(1);
-			paramsSplitted = paramsStr.replace(/([,])/gi, "\n");
-			paramsSplitted = paramsSplitted.replace(/([-])/gi, "\n$1");
+			if(isIE) {
+				paramsSplitted = paramsStr.replace(/[\s]/gi, "\n");
+			} else {
+				paramsSplitted = paramsStr.replace(/([,])/gi, "\n");
+				paramsSplitted = paramsSplitted.replace(/([-])/gi, "\n$1");
+			}
 			params = paramsSplitted.split("\n");
-			if(params[0] == "") {
-				params.shift();
+			for(var j = params.length; j >= 0; j--) {
+				if(params[j] == "") {
+					params.splice(j, 1);
+				}
 			}
 			finalCommand.letter = letter;
 			switch(letter) {
