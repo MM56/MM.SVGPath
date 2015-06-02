@@ -85,7 +85,7 @@ MM.SVGPath = (function() {
 
 					str += x + "," + y;
 
-					if(i == 0) {
+					if(resetStartLocation) {
 						startLocation = {x: currentLocation.x, y: currentLocation.y};
 					}
 					break;
